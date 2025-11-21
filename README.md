@@ -269,6 +269,95 @@ switchport access vlan 10
 
 ---
 
+## Advanced Configuration: Inter-VLAN Routing (Router-on-a-Stick)
+
+### To enable communication between different VLANs (e.g., STAFF and GUEST) on the same switch, a "Router-on-a-Stick" configuration is implemented on Router 1 and Switch 0.
+
+### 1. Subnetting Strategy
+
+To separate traffic, the original LAN 1 (192.168.10.0/24) is split into two smaller subnets:
+
+VLAN 10 (STAFF): 192.168.10.0/25 (IP Range: .1 to .126)
+
+VLAN 20 (GUEST): 192.168.10.128/25 (IP Range: .129 to .254)
+
+### 2. Router 1 Configuration (Sub-Interfaces)
+
+The physical interface is stripped of its IP and divided into logical sub-interfaces.
+
+```
+enable
+conf t
+
+! Remove IP from physical interface
+interface g0/0/0
+ no ip address
+ no shutdown
+ exit
+
+! Create Sub-Interface for VLAN 10
+interface g0/0/0.10
+ encapsulation dot1Q 10
+ ip address 192.168.10.1 255.255.255.128
+ exit
+
+! Create Sub-Interface for VLAN 20
+interface g0/0/0.20
+ encapsulation dot1Q 20
+ ip address 192.168.10.129 255.255.255.128
+ exit
+
+```
+
+### 3. Updated DHCP Configuration (R1)
+
+DHCP pools must be updated to match the new split subnets so devices get the correct Gateway.
+
+```
+! Pool for VLAN 10 (Staff)
+ip dhcp pool VLAN10_STAFF
+ network 192.168.10.0 255.255.255.128
+ default-router 192.168.10.1
+ dns-server 8.8.8.8
+
+! Pool for VLAN 20 (Guest)
+ip dhcp pool VLAN20_GUEST
+ network 192.168.10.128 255.255.255.128
+ default-router 192.168.10.129
+ dns-server 8.8.8.8
+
+```
+
+### 4. Switch 0 Configuration (Trunking)
+
+The connection to the router must carry tags for both VLANs, so it is set to Trunk Mode instead of Access Mode.
+
+```
+enable
+conf t
+
+! Configure Access Ports for PCs
+interface fa0/1
+ switchport mode access
+ switchport access vlan 10
+interface fa0/2
+ switchport mode access
+ switchport access vlan 20
+
+! Configure Uplink to Router as Trunk
+interface gig0/1
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ no shutdown
+
+```
+
+
+
+
+
+
+
 ## Server Configuration
 
 ### Web Server (on R3 LAN 6)
