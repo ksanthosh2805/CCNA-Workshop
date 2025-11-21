@@ -37,6 +37,8 @@ The enterprise network is built around three main routers, each managing two LAN
   - Manages LAN 5 (Left) and LAN 6 (Right).
   - Hosts the Web Server in LAN 6.
 
+<img width="1611" height="632" alt="image" src="https://github.com/user-attachments/assets/921b36ba-a1cf-4044-8c5d-4eef9424b200" />
+
 ---
 
 ## IP Addressing Plan
@@ -55,7 +57,8 @@ The enterprise network is built around three main routers, each managing two LAN
 | R3     | G0/0/0    | LAN 5 (Left) Gateway    | 192.168.30.1     | 255.255.255.0      |
 | R3     | G0/0/1    | LAN 6 (Right) Gateway   | 192.168.31.1     | 255.255.255.0      |
 | R3     | S0/1/0    | WAN link to R2          | 10.2.2.2         | 255.255.255.252    |
-| Server | NIC       | Web Server (on R3 LAN6) | 192.168.31.100   | 255.255.255.0      |
+| Server | NIC       | Web Server (on R3 LAN5) | 192.168.30.4   | 255.255.255.0      |
+| Server | NIC       | Web Server (on R3 LAN6) | 192.168.31.4   | 255.255.255.0      |
 
 - All end devices in each LAN receive IPs via DHCP from their respective router.  
 - WAN links use /30 subnets for point‑to‑point efficiency.
@@ -350,6 +353,10 @@ show vlan brief
   - VLAN 20 labeled `GUEST` (if used) with its ports listed.
 
 ---
+
+## Output
+
+
 
 ## Expected Learning Outcomes
 
